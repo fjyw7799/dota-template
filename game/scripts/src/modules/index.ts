@@ -1,11 +1,14 @@
 import { Debug } from './Debug';
 import { GameConfig } from './GameConfig';
+import { MobSpawner } from './MobSpawner';
 import { XNetTable } from './xnet-table';
 
 declare global {
     interface CDOTAGameRules {
         // 声明所有的GameRules模块，这个主要是为了方便其他地方的引用（保证单例模式）
         XNetTable: XNetTable;
+
+        MobSpawner: MobSpawner;
     }
 }
 
@@ -14,6 +17,7 @@ declare global {
  * 因此在这里作为单例模式使用
  **/
 export function ActivateModules() {
+    print("================1");
     if (GameRules.XNetTable == null) {
         // 初始化所有的GameRules模块
         GameRules.XNetTable = new XNetTable();
@@ -22,4 +26,9 @@ export function ActivateModules() {
         // 初始化测试模块xD
         new Debug();
     }
+
+    print("================2");
+    GameRules.SetPreGameTime(5)
+    GameRules.MobSpawner = new MobSpawner();
+    GameRules.MobSpawner.Start();
 }
