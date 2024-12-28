@@ -2,6 +2,8 @@ import { Debug } from './Debug';
 import { GameConfig } from './GameConfig';
 import { MobSpawner } from './MobSpawner';
 import { XNetTable } from './xnet-table';
+import { CameraControl } from './camera-control';
+import { ItemSelection } from './item-selection';
 
 declare global {
     interface CDOTAGameRules {
@@ -17,17 +19,20 @@ declare global {
  * 因此在这里作为单例模式使用
  **/
 export function ActivateModules() {
-    print("================1");
+    print("start ActivateModules");
     if (GameRules.XNetTable == null) {
         // 初始化所有的GameRules模块
         GameRules.XNetTable = new XNetTable();
+        // 添加相机控制
+        new CameraControl();
+        // 添加道具选择
+        new ItemSelection();
         // 如果某个模块不需要在其他地方使用，那么直接在这里使用即可
         new GameConfig();
         // 初始化测试模块xD
         new Debug();
     }
 
-    print("================2");
     GameRules.SetPreGameTime(5)
     GameRules.MobSpawner = new MobSpawner();
     GameRules.MobSpawner.Start();
