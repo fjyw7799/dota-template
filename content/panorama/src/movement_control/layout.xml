@@ -1,0 +1,9 @@
+<root>
+    <scripts>
+        <include src="./script.tsx" />
+    </scripts>
+	<Panel class="MainPanel">
+        <!-- Add this to verify the panel loads -->
+        <Label text="Movement Controls Loaded" />
+    </Panel>
+</root>

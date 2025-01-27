@@ -8,4 +8,10 @@ declare interface CustomGameEventDeclarations {
         foo: number;
         bar: string;
     };
+        // 移动输入事件
+    movement_input: {
+        key: string;
+        pressed: 0|1;
+        PlayerID:PlayerID;
+    };
 }

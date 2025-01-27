@@ -4,6 +4,7 @@ import { MobSpawner } from './MobSpawner';
 import { XNetTable } from './xnet-table';
 import { CameraControl } from './camera-control';
 import { ItemSelection } from './item-selection';
+import { MoveControl } from './moveControl';
 
 declare global {
     interface CDOTAGameRules {
@@ -27,6 +28,8 @@ export function ActivateModules() {
         new CameraControl();
         // 添加道具选择
         new ItemSelection();
+
+        new MoveControl();
         // 如果某个模块不需要在其他地方使用，那么直接在这里使用即可
         new GameConfig();
         // 初始化测试模块xD

@@ -1,18 +1,31 @@
 import 'panorama-polyfill-x/lib/console';
 import 'panorama-polyfill-x/lib/timers';
+import { AddKeyBind } from "../utils/lib";
 
 import { useMemo, useEffect, useState, type FC } from 'react';
 import { render } from 'react-panorama-x';
 // import { useXNetTableKey } from '../hooks/useXNetTable';
 
 const ItemSelection: FC = () => {
-    const [isWindowVisible, setIsWindowVisible] = useState(true);
+    const [isWindowVisible, setIsWindowVisible] = useState(false);
     // const data = useXNetTableKey(`test_table`, `test_key`, { data_1: `unknown` });
     // const string_data = data.data_1;
 
-    const OnKeyPress = (key: string, pressed: boolean) => {
-        $.Msg(`Key ${key} ${pressed ? 'pressed' : 'released'}`);
-    };
+    // const OnKeyPress = (key: string, pressed: boolean) => {
+    //     $.Msg(`Key ${key} ${pressed ? 'pressed' : 'released'}`);
+    // };
+
+    function OnKeyPress(key: string, pressed: 0|1) {
+        $.Msg("Key pressed: " + key + " state: " + pressed);  // Debug line
+
+        // isKeyDown[key] = pressed;
+
+        GameEvents.SendCustomGameEventToServer("movement_input", {
+            key: key,
+            pressed: pressed,
+            PlayerID: Players.GetLocalPlayer()
+        });
+    }
 
     function OnToggleWindow() {
         $.Msg("#####OnToggleWindow...", isWindowVisible);
@@ -28,33 +41,38 @@ const ItemSelection: FC = () => {
     };
 
     useEffect(() => {
-        console.log(`GameEvents.Subscribe('toggle_item_selection'`);
         const id = GameEvents.Subscribe('toggle_item_selection', (event)=>{
             $.Msg("#####toggle_item_selection");
             OnToggleWindow();
         });
         const itemSelectionCommand = `+ToggleItemSelection${Date.now()}`;
         Game.AddCommand(itemSelectionCommand, ()=> OnToggleWindow(), "", 0);
-
-        $.Msg("Registering key bindings..."); // Debug line
-        const command = `CustomForward${Date.now()}`;
-        // Register WASD with custom names
-        Game.CreateCustomKeyBind('W', `+${command}`);
-        // Game.CreateCustomKeyBind('A', '+CustomLeft');
-        // Game.CreateCustomKeyBind('S', '+CustomBack');
-        // Game.CreateCustomKeyBind('D', '+CustomRight');
-
         Game.CreateCustomKeyBind('I', itemSelectionCommand);
 
+        const wCommand = `w${Date.now()}`;
+        Game.AddCommand(`+${wCommand}`, ()=> OnKeyPress('w', 1), "", 0);
+        Game.AddCommand(`-${wCommand}`, ()=> OnKeyPress('w', 0), "", 0);
+        Game.CreateCustomKeyBind('W', `+${wCommand}`);
 
-        Game.AddCommand(`+${command}`, () => OnKeyPress('w', true), '', 0);
-        // Game.AddCommand('-CustomForward1', () => OnKeyPress('w', false), '', 0);
-        // Game.AddCommand('+CustomLeft', () => OnKeyPress('a', true), '', 0);
-        // Game.AddCommand('-CustomLeft', () => OnKeyPress('a', false), '', 0);
-        // Game.AddCommand('+CustomBack', () => OnKeyPress('s', true), '', 0);
-        // Game.AddCommand('-CustomBack', () => OnKeyPress('s', false), '', 0);
-        // Game.AddCommand('+CustomRight', () => OnKeyPress('d', true), '', 0);
-        // Game.AddCommand('-CustomRight', () => OnKeyPress('d', false), '', 0);
+        const aCommand = `a${Date.now()}`;
+        Game.AddCommand(`+${aCommand}`, ()=> OnKeyPress('a', 1), "", 0);
+        Game.AddCommand(`-${aCommand}`, ()=> OnKeyPress('a', 0), "", 0);
+        Game.CreateCustomKeyBind('A', `+${aCommand}`);
+
+        const sCommand = `s${Date.now()}`;
+        Game.AddCommand(`+${sCommand}`, ()=> OnKeyPress('s', 1), "", 0);
+        Game.AddCommand(`-${sCommand}`, ()=> OnKeyPress('s', 0), "", 0);
+        Game.CreateCustomKeyBind('S', `+${sCommand}`);
+
+        const dCommand = `d${Date.now()}`;
+        Game.AddCommand(`+${dCommand}`, ()=> OnKeyPress('d', 1), "", 0);
+        Game.AddCommand(`-${dCommand}`, ()=> OnKeyPress('d', 0), "", 0);
+        Game.CreateCustomKeyBind('D', `+${dCommand}`);
+
+        // AddKeyBind("W", () => OnKeyPress('w', 1), () => OnKeyPress('w', 0));
+        // AddKeyBind("A", () => OnKeyPress('a', 1), () => OnKeyPress('a', 0));
+        // AddKeyBind("S", () => OnKeyPress('s', 1), () => OnKeyPress('s', 0));
+        // AddKeyBind("D", () => OnKeyPress('d', 1), () => OnKeyPress('d', 0));
 
         // 清理函数
         return () => {
@@ -62,10 +80,6 @@ const ItemSelection: FC = () => {
             // Game.RemoveCommand("+ToggleItemSelection");
         };
     }, []); // 空依赖数组，只在组件挂载时执行一次
-
-    useEffect(() => {
-        $.Msg("isWindowVisible changed to:", isWindowVisible);
-    }, [isWindowVisible]);
 
     return useMemo(() => (
         <Panel id="ItemSelectionWindow" className={`ItemSelectionWindow ${isWindowVisible ? '' : 'Hidden'}`}>

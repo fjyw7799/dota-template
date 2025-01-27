@@ -4,4 +4,5 @@ interface CustomGameEventDeclarations {
         item_name: string;
     };
     toggle_item_selection: {};
-} 
+    // enable_custom_input: {};
+}
